@@ -35,10 +35,15 @@ export async function GET() {
     });
 
     const raw = metadata.format?.chapters ?? [];
-    const chapters: Chapter[] = raw.map((ch) => ({
-      title: ch.title ?? "Chapter",
-      startSeconds: Number.isFinite(ch.start) ? Math.max(0, ch.start) : 0,
-    }));
+    const chapters: Chapter[] = raw.map((ch) => {
+      // MP4/M4B chapters use timeScale (e.g. 44100 = sample rate); divide to get seconds
+      const scale = ch.timeScale && ch.timeScale > 0 ? ch.timeScale : 1;
+      const seconds = Number.isFinite(ch.start) ? ch.start / scale : 0;
+      return {
+        title: ch.title ?? "Chapter",
+        startSeconds: Math.max(0, seconds),
+      };
+    });
 
     // Sort by start time and dedupe by start (keep first title)
     const byStart = new Map<number, string>();
