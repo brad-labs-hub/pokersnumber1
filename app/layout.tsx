@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Audiobook Player",
+  title: "Poker's Number 1",
   description: "Private audiobook player",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Audiobook"
+    title: "Poker's Number 1"
   },
   formatDetection: { telephone: false }
 };
