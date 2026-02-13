@@ -107,16 +107,16 @@ export function AudioPlayer() {
       <main className="mt-6 flex flex-1 flex-col justify-center">
         <div className="mx-auto w-full">
           <div className="mx-auto w-[78%] max-w-[340px]">
-            <div className="relative aspect-square overflow-hidden rounded-[28px] shadow-glow ring-1 ring-white/10">
+            <div className="relative aspect-square overflow-hidden rounded-[28px] shadow-glow ring-1 ring-white/10 bg-black/20">
               <Image
                 src={AUDIOBOOK.artUrl}
                 alt="Album art"
                 fill
                 priority
                 sizes="(max-width: 768px) 70vw, 340px"
-                className="object-cover"
+                className="object-contain"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10 pointer-events-none" />
             </div>
           </div>
 
@@ -130,19 +130,16 @@ export function AudioPlayer() {
 
             <div className="mt-4 grid grid-cols-3 items-center gap-3">
               <button
+                type="button"
                 onClick={() => player.skipBy(-15)}
-                className="flex items-center justify-center rounded-2xl bg-white/10 py-3 text-white ring-1 ring-white/10 hover:bg-white/15"
+                className="flex items-center justify-center rounded-2xl bg-white/10 py-3 text-white ring-1 ring-white/10 hover:bg-white/15 active:bg-white/20"
                 aria-label="Back 15 seconds"
               >
-                <div className="relative">
-                  <RotateCcw className="h-6 w-6" />
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold text-white/80">
-                    15
-                  </span>
-                </div>
+                <RotateCcw className="h-6 w-6" />
               </button>
 
               <button
+                type="button"
                 onClick={() => player.toggle()}
                 className={cn(
                   "mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-glow ring-1 ring-white/30",
@@ -154,16 +151,12 @@ export function AudioPlayer() {
               </button>
 
               <button
+                type="button"
                 onClick={() => player.skipBy(30)}
-                className="flex items-center justify-center rounded-2xl bg-white/10 py-3 text-white ring-1 ring-white/10 hover:bg-white/15"
+                className="flex items-center justify-center rounded-2xl bg-white/10 py-3 text-white ring-1 ring-white/10 hover:bg-white/15 active:bg-white/20"
                 aria-label="Forward 30 seconds"
               >
-                <div className="relative">
-                  <RotateCw className="h-6 w-6" />
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[11px] font-semibold text-white/80">
-                    30
-                  </span>
-                </div>
+                <RotateCw className="h-6 w-6" />
               </button>
             </div>
 

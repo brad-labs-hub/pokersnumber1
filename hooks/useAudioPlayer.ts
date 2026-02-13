@@ -114,7 +114,10 @@ export function useAudioPlayer(opts: {
 
   const skipBy = useCallback(
     (deltaSeconds: number) => {
-      seek(time + deltaSeconds);
+      const a = audioRef.current;
+      if (!a) return;
+      const now = Number.isFinite(a.currentTime) ? a.currentTime : time;
+      seek(now + deltaSeconds);
     },
     [seek, time]
   );
