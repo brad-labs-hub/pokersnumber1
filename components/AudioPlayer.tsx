@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { Pause, Play, RotateCcw, RotateCw, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { CHAPTERS, AUDIOBOOK } from "@/lib/media";
+import { CHAPTERS as FALLBACK_CHAPTERS, AUDIOBOOK } from "@/lib/media";
+import type { Chapter } from "@/lib/media";
 import { cn } from "@/lib/cn";
 import { formatTime } from "@/lib/time";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -15,6 +16,8 @@ import { ResumeToast } from "@/components/ResumeToast";
 export function AudioPlayer() {
   const player = useAudioPlayer({ src: AUDIOBOOK.audioUrl, persist: true, initialRate: 1 });
   const [toastOpen, setToastOpen] = useState(false);
+  const [chapters, setChapters] = useState<Chapter[]>(FALLBACK_CHAPTERS);
+  const [chaptersLoading, setChaptersLoading] = useState(true);
 
   useEffect(() => {
     if (!player.hasResume) return;
@@ -23,6 +26,29 @@ export function AudioPlayer() {
     return () => window.clearTimeout(t);
   }, [player.hasResume]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setChaptersLoading(true);
+    fetch("/api/chapters")
+      .then((res) => {
+        if (!res.ok) throw new Error(res.statusText);
+        return res.json();
+      })
+      .then((data: { chapters?: Chapter[] }) => {
+        if (cancelled || !Array.isArray(data.chapters)) return;
+        if (data.chapters.length > 0) setChapters(data.chapters);
+      })
+      .catch(() => {
+        if (!cancelled) setChapters(FALLBACK_CHAPTERS);
+      })
+      .finally(() => {
+        if (!cancelled) setChaptersLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const title = AUDIOBOOK.title;
   const subtitle = AUDIOBOOK.author ? AUDIOBOOK.author : "Audiobook";
 
@@ -30,11 +56,11 @@ export function AudioPlayer() {
 
   const currentChapter = useMemo(() => {
     let idx = 0;
-    for (let i = 0; i < CHAPTERS.length; i++) {
-      if (CHAPTERS[i]!.startSeconds <= player.time) idx = i;
+    for (let i = 0; i < chapters.length; i++) {
+      if (chapters[i]!.startSeconds <= player.time) idx = i;
     }
-    return CHAPTERS[idx];
-  }, [player.time]);
+    return chapters[idx];
+  }, [chapters, player.time]);
 
   return (
     <div className="relative mx-auto flex min-h-[100svh] max-w-md flex-col px-4 pb-[max(env(safe-area-inset-bottom),20px)] pt-[max(env(safe-area-inset-top),18px)]">
@@ -67,7 +93,8 @@ export function AudioPlayer() {
         <div className="flex shrink-0 items-center gap-2">
           <SpeedDial value={player.rate} onChange={(r) => player.setPlaybackRate(r)} />
           <ChapterDrawer
-            chapters={CHAPTERS}
+            chapters={chapters}
+            chaptersLoading={chaptersLoading}
             currentTimeSeconds={player.time}
             onSelectChapter={(s) => {
               player.seek(s);

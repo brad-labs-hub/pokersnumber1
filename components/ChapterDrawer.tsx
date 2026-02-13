@@ -9,6 +9,7 @@ import { formatTime } from "@/lib/time";
 
 export function ChapterDrawer(props: {
   chapters: Chapter[];
+  chaptersLoading?: boolean;
   currentTimeSeconds: number;
   onSelectChapter: (startSeconds: number) => void;
   className?: string;
@@ -70,7 +71,10 @@ export function ChapterDrawer(props: {
                 </div>
 
                 <div className="max-h-[55vh] overflow-auto px-2 pb-3">
-                  {props.chapters.map((c, i) => {
+                  {props.chaptersLoading ? (
+                    <p className="py-6 text-center text-sm text-white/60">Loading chapters…</p>
+                  ) : (
+                  props.chapters.map((c, i) => {
                     const active = i === activeIndex;
                     return (
                       <button
@@ -99,7 +103,8 @@ export function ChapterDrawer(props: {
                         ) : null}
                       </button>
                     );
-                  })}
+                  })
+                  )}
                 </div>
               </div>
             </motion.div>
